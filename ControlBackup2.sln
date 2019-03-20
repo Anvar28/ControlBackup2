@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "clientConsole", "clientConsole\clientConsole.csproj", "{AB7E8905-EE37-44ED-BA5E-473510D00DF7}"
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "serverFlask", "serverFlask\serverFlask.pyproj", "{6B225773-DC5A-4913-912E-16EF2ADC6C4A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{AB7E8905-EE37-44ED-BA5E-473510D00DF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB7E8905-EE37-44ED-BA5E-473510D00DF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB7E8905-EE37-44ED-BA5E-473510D00DF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B225773-DC5A-4913-912E-16EF2ADC6C4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B225773-DC5A-4913-912E-16EF2ADC6C4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B225773-DC5A-4913-912E-16EF2ADC6C4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B225773-DC5A-4913-912E-16EF2ADC6C4A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

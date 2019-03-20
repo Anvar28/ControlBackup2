@@ -58,7 +58,8 @@ namespace clientConsole
         public void Start()
         {
             LoadFromIni();
-            SendInfo();
+            string serializeData = JsonConvert.SerializeObject(GetData(programData));
+            SendInfo(serializeData);
         }
 
         // Load property fom ini file, 
@@ -134,33 +135,40 @@ namespace clientConsole
             return result;
         }
 
-        void SendInfo()
+        void SendInfo(string serializeData)
         {
-            TSendingData data = GetData(programData);
-            string serializeData = JsonConvert.SerializeObject(data);
-
-            WebRequest request = WebRequest.Create("http://" + programData.server);
+            string server = "http://" + programData.server + "/data";
+            WebRequest request = WebRequest.Create(server);
             request.Method = "POST";
             byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(serializeData);
             request.ContentType = "application/x-www-form-urlencoded";
             request.ContentLength = byteArray.Length;
-
-            //записываем данные в поток запроса
-            using (Stream dataStream = request.GetRequestStream())
+            try
             {
-                dataStream.Write(byteArray, 0, byteArray.Length);
-            }
+                Console.WriteLine("Попытка подключения к серверу " + server);
 
-            WebResponse response = request.GetResponse();
-            using (Stream stream = response.GetResponseStream())
-            {
-                using (StreamReader reader = new StreamReader(stream))
+                //записываем данные в поток запроса
+                using (Stream dataStream = request.GetRequestStream())
                 {
-                    Console.WriteLine(reader.ReadToEnd());
+                    dataStream.Write(byteArray, 0, byteArray.Length);
                 }
+
+                WebResponse response = request.GetResponse();
+                using (Stream stream = response.GetResponseStream())
+                {
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        Console.WriteLine(reader.ReadToEnd());
+                    }
+                }
+                response.Close();
+                Console.WriteLine("Запрос выполнен...");                
+
             }
-            response.Close();
-            Console.WriteLine("Запрос выполнен...");
+            catch (Exception e)
+            {
+                Console.WriteLine("Ошибка выполнения запроса к серверу: {0}", e.Message);
+            }
         }
     }
 
