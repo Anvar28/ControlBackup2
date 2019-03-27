@@ -30,6 +30,9 @@
     <Compile Include="app\db_scripts\db_create.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="app\db_scripts\db_migrate.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="app\forms.py">
       <SubType>Code</SubType>
     </Compile>

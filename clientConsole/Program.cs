@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace clientConsole
 {
-    class TProgramData
+    public class TProgramData
     {
         public string server;
         public string pathBackup;
@@ -16,31 +16,37 @@ namespace clientConsole
         public string name;
     }
 
-    class TFileInfo
+    public class TFileInfo
     {
         public string name;
         public long size;
-        public DateTime dataCreate;
+        public string dataCreate;
     }
 
-    class TSendingData
+    public class TSendingData
     {
         public string company;
         public string name;
+        public string path;
+        public long freespace;
         public List<TFileInfo> fileList = new List<TFileInfo>();
     }
 
-    class TApp
+    public class TApp
     {
         private TProgramData programData = new TProgramData();
         private TParam param = new TParam();
+
+        public TApp()
+        {
+        }
 
         public TApp(string[] args)
         {
             ParseParam(args);
         }
 
-        void ParseParam(string[] args)
+        public void ParseParam(string[] args)
         {
             param.Add("-f", TTypeParamData.tBoll, "", "Если указан, то настройки берутся из param.ini файла. Файл с пустыми настройками создан.");
             param.Add("-s", TTypeParamData.tString, "pioner-plus.ru:5060", "Адрес сервера сбора статистики");
@@ -105,8 +111,28 @@ namespace clientConsole
             }
         }
 
+        // return free space on disk
+        private long GetFreeSpaceOnDisk(string path)
+        {
+            long result = 0;
+            string driveLetter = path;
+            int k = path.LastIndexOf("\\");
+            if (k > 0)
+                driveLetter = path.Substring(0, k);
+
+            try
+            {
+                DriveInfo di = new DriveInfo(driveLetter);
+                result = di.TotalFreeSpace;
+            }
+            catch (Exception)
+            {
+            }
+            return result;
+        }
+
         // Create and fill class TSendingData
-        TSendingData GetData(TProgramData programData)
+        public TSendingData GetData(TProgramData programData)
         {
             TSendingData result = null;
             if (programData.pathBackup.Length > 0 && Directory.Exists(programData.pathBackup))
@@ -114,18 +140,25 @@ namespace clientConsole
                 result = new TSendingData();
                 result.company = programData.company;
                 result.name = programData.name;
+                result.path = programData.pathBackup;
+                result.freespace = GetFreeSpaceOnDisk(result.path);
 
                 string[] files = Directory.GetFiles(programData.pathBackup).OrderByDescending(x => new FileInfo(x).CreationTime).ToArray();
                 foreach (string file in files)
                 {
-                    result.fileList.Add(
-                        new TFileInfo()
-                        {
-                            name = file,
-                            size = new FileInfo(file).Length,
-                            dataCreate = Directory.GetCreationTime(file)
-                        }
-                    );
+                    int k = file.LastIndexOf("\\");
+                    if (k > 0)
+                    {
+                        string fileName = file.Substring(k+1);
+                        result.fileList.Add(
+                            new TFileInfo()
+                            {
+                                name = fileName,
+                                size = new FileInfo(file).Length,
+                                dataCreate = Directory.GetCreationTime(file).ToString("dd.MM.yyyy HH:mm:ss")
+                            }
+                        );
+                    }
                 }
             }
             else
@@ -135,14 +168,17 @@ namespace clientConsole
             return result;
         }
 
-        void SendInfo(string serializeData)
+        public void SendInfo(string serializeData)
         {
-            string server = "http://" + programData.server + "/data";
+            string server = programData.server;
             WebRequest request = WebRequest.Create(server);
             request.Method = "POST";
+            request.ContentType = "application/json";
             byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(serializeData);
-            request.ContentType = "application/x-www-form-urlencoded";
             request.ContentLength = byteArray.Length;
+
+            request.Credentials = new NetworkCredential("admin", "");
+
             try
             {
                 Console.WriteLine("Попытка подключения к серверу " + server);
@@ -174,7 +210,6 @@ namespace clientConsole
 
     class Program
     {
-
         static void Main(string[] args)
         {
             TApp app = new TApp(args);

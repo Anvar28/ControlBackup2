@@ -6,8 +6,8 @@ using System.Text;
 
 namespace clientConsole
 {
-    enum TTypeParamData { tBoll, tString }
-    class TParamData
+    public enum TTypeParamData { tBoll, tString }
+    public class TParamData
     {
 
         public string command;
@@ -24,7 +24,7 @@ namespace clientConsole
         }
     }
 
-    class TParam : IEnumerable, IEnumerator
+    public class TParam : IEnumerable, IEnumerator
     {
         private Dictionary<string, TParamData> paramList;
         int index = -1;
