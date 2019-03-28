@@ -14,6 +14,8 @@ namespace clientConsole
         public string pathBackup;
         public string company;
         public string name;
+        public string username;
+        public string password;
     }
 
     public class TFileInfo
@@ -49,16 +51,20 @@ namespace clientConsole
         public void ParseParam(string[] args)
         {
             param.Add("-f", TTypeParamData.tBoll, "", "Если указан, то настройки берутся из param.ini файла. Файл с пустыми настройками создан.");
-            param.Add("-s", TTypeParamData.tString, "pioner-plus.ru:5060", "Адрес сервера сбора статистики");
+            param.Add("-s", TTypeParamData.tString, "http://pioner-plus.ru:5060", "Адрес сервера сбора статистики");
             param.Add("-c", TTypeParamData.tString, "myCompany", "Название организации, например \"Рога и копыта\" ");
             param.Add("-n", TTypeParamData.tString, "base1", "Название контролируемого каталога, например \"БазаТорговли\"");
             param.Add("-pb", TTypeParamData.tString, "", "Путь к каталогу");
+            param.Add("-u", TTypeParamData.tString, "sender", "Имя пользователя");
+            param.Add("-p", TTypeParamData.tString, "", "Пароль");
             param.Parse(args);
 
             programData.server = param.Get("-s").data;
             programData.pathBackup = param.Get("-pb").data;
             programData.company = param.Get("-c").data;
             programData.name = param.Get("-n").data;
+            programData.username = param.Get("-u").data;
+            programData.password = param.Get("-p").data;
         }
 
         public void Start()
@@ -77,6 +83,8 @@ namespace clientConsole
             string iniPathbackup = "pathbackup";
             string iniCompany = "company";
             string iniName = "name";
+            string iniUserName = "username";
+            string iniPassword = "password";
 
             if (param.ParamEmpty)
             {
@@ -85,6 +93,8 @@ namespace clientConsole
                 ini.Write(iniSection, iniPathbackup, "");
                 ini.Write(iniSection, iniCompany, "");
                 ini.Write(iniSection, iniName, "");
+                ini.Write(iniSection, iniUserName, "");
+                ini.Write(iniSection, iniPassword, "");
 
                 Console.WriteLine("13/03/2019 apxi2@yandex.ru");
                 Console.WriteLine("Программа контроля создания архивов.");
@@ -108,6 +118,8 @@ namespace clientConsole
                 programData.pathBackup = ini.Read(iniSection, iniPathbackup);
                 programData.company = ini.Read(iniSection, iniCompany);
                 programData.name = ini.Read(iniSection, iniName);
+                programData.username = ini.Read(iniSection, iniUserName);
+                programData.password = ini.Read(iniSection, iniPassword);
             }
         }
 
@@ -177,7 +189,7 @@ namespace clientConsole
             byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(serializeData);
             request.ContentLength = byteArray.Length;
 
-            request.Credentials = new NetworkCredential("admin", "");
+            request.Credentials = new NetworkCredential(programData.username, programData.password);
 
             try
             {
@@ -204,6 +216,8 @@ namespace clientConsole
             catch (Exception e)
             {
                 Console.WriteLine("Ошибка выполнения запроса к серверу: {0}", e.Message);
+                Console.WriteLine("Отправляеммые данные:");
+                Console.WriteLine(serializeData);
             }
         }
     }
