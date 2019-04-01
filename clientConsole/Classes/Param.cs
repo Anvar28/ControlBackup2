@@ -51,13 +51,13 @@ namespace clientConsole
             // Заполним параметры из командной строки
             int count = args.Count();
             for (int i = 0; i < paramList.Count(); i++)
-            {
-                _paramEmpty = false;
+            {                
                 var itemParam = paramList.ElementAt(i);
                 string key = itemParam.Key;
                 TParamData value = itemParam.Value;
                 for (int j = 0; j < count; j++)
                 {
+                    _paramEmpty = false;
                     if (key == args[j])
                     {
                         if (value.type == TTypeParamData.tBoll)
